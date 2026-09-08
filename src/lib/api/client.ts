@@ -1,6 +1,6 @@
 const TOKEN_KEY = "qisas.token";
 export const AUTH_LOST_EVENT = "qisas:auth-lost";
-const PRODUCTION_API = "http://localhost:8000";
+const PRODUCTION_API = "https://qisasss-production.up.railway.app";
 
 export function apiBase(): string {
   const fromEnv = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");

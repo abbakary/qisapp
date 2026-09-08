@@ -1,7 +1,7 @@
 {
   "build": {
     "env": {
-      "VITE_API_URL": "https://qisass-production.up.railway.app"
+      "VITE_API_URL": "https://qisasss-production.up.railway.app"
     }
   },
   "rewrites": [
