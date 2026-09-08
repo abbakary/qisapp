@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { fmtDuration } from "../lib/content-rules";
 import { db } from "../lib/mock/db";
 import { useAuth } from "../context/AuthContext";
+import { mediaUrl as resolveMedia } from "../lib/api/client";
 
 const HIDE_DELAY = 3000;
 
@@ -40,6 +41,9 @@ export default function MediaPlayer({
   const lastSaved = useRef(0);
   const seededRef = useRef(false);
   const askedSave = useRef(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const src = resolveMedia(mediaUrl);
+  const posterSrc = poster ? resolveMedia(poster) : undefined;
 
   useEffect(() => {
     playingRef.current = playing;
@@ -54,16 +58,33 @@ export default function MediaPlayer({
     [episodeId, user?.id],
   );
 
+  useEffect(() => {
+    setLoadError(null);
+    seededRef.current = false;
+    setDur(0);
+    setCur(initialPosition);
+    setPlaying(false);
+  }, [src, initialPosition]);
+
   const onLoaded = () => {
     const el = ref.current;
     if (!el) return;
-    setDur(el.duration || 0);
+    setLoadError(null);
+    setDur(Number.isFinite(el.duration) ? el.duration : 0);
     if (!seededRef.current && initialPosition > 0 && initialPosition < (el.duration || Infinity) - 2)
       el.currentTime = initialPosition;
     seededRef.current = true;
     if (autoPlay) {
-      el.play().catch(() => {});
+      el.play().catch((err) => {
+        if (err?.name === "NotAllowedError" || err?.name === "AbortError") return;
+        setLoadError(err?.message || "Video haiwezi kucheza.");
+      });
     }
+  };
+
+  const onMediaError = () => {
+    setPlaying(false);
+    setLoadError("Video haipo kwenye seva. Pakia tena faili hii kwenye Admin.");
   };
 
   const onTime = () => {
@@ -155,7 +176,19 @@ export default function MediaPlayer({
     const el = ref.current;
     if (!el) return;
     if (el.paused || el.ended) {
-      el.play().catch(() => {});
+      const start = el.play();
+      if (start) {
+        start.catch((err) => {
+          if (err?.name === "NotAllowedError" || err?.name === "AbortError") return;
+          const code = el.error?.code;
+          const missing = code === 4 || code === 1;
+          setLoadError(
+            missing
+              ? "Video haipo kwenye seva. Pakia tena faili hii kwenye Admin."
+              : err?.message || "Video haiwezi kucheza.",
+          );
+        });
+      }
     } else {
       el.pause();
       save(el.currentTime, false);
@@ -193,6 +226,7 @@ export default function MediaPlayer({
     onEnded,
     onPlay: syncPlayingFromElement,
     onPause: syncPlayingFromElement,
+    onError: onMediaError,
   };
 
   const shellClass = isFullscreen
@@ -223,19 +257,19 @@ export default function MediaPlayer({
         {mediaType === "VIDEO" ? (
           <video
             ref={ref as React.RefObject<HTMLVideoElement>}
-            src={mediaUrl}
-            poster={poster ?? undefined}
-            preload="none"
-            className="absolute inset-0 h-full w-full object-contain"
+            src={src}
+            poster={posterSrc}
+            preload="metadata"
+            className="qisas-media absolute inset-0 h-full w-full object-contain"
             playsInline
             {...mediaEvents}
           />
         ) : (
           <>
-            {poster && (
+            {posterSrc && (
               <>
                 <img
-                  src={poster}
+                  src={posterSrc}
                   alt=""
                   className={`absolute inset-0 h-full w-full object-cover ${
                     isFullscreen ? "opacity-20 scale-110 blur-sm" : "object-[50%_28%]"
@@ -250,11 +284,17 @@ export default function MediaPlayer({
             )}
             <audio
               ref={ref as React.RefObject<HTMLAudioElement>}
-              src={mediaUrl}
-              preload="none"
+              src={src}
+              preload="metadata"
               {...mediaEvents}
             />
           </>
+        )}
+
+        {loadError && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/75 p-5 text-center">
+            <p className="max-w-sm text-sm font-semibold leading-relaxed text-white/90">{loadError}</p>
+          </div>
         )}
 
         {mediaType === "VIDEO" ? (
@@ -317,9 +357,9 @@ export default function MediaPlayer({
               >
                 <ExitFullscreenIcon />
               </button>
-              {poster && (
+              {posterSrc && (
                 <div className="relative z-10 mb-10 h-56 w-56 overflow-hidden rounded-3xl shadow-2xl ring-2 ring-gold/30">
-                  <img src={poster} alt="" className="h-full w-full object-cover" />
+                  <img src={posterSrc} alt="" className="h-full w-full object-cover" />
                 </div>
               )}
               <button

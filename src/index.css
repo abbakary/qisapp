@@ -132,3 +132,12 @@ body {
     to   { opacity: 1; transform: translateX(0)     scale(1);    }
   }
 }
+
+/* Hide Chrome's native play overlay so our controls receive the click. */
+video.qisas-media::-webkit-media-controls {
+  display: none !important;
+}
+video.qisas-media::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}

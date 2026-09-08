@@ -1,5 +1,6 @@
 import React from "react";
 import type { MediaType } from "../../lib/mock/types";
+import { mediaUrl as resolveMedia } from "../../lib/api/client";
 
 interface MediaPreviewModalProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export default function MediaPreviewModal({
   posterUrl,
 }: MediaPreviewModalProps) {
   if (!isOpen) return null;
+  const src = resolveMedia(mediaUrl);
+  const poster = posterUrl ? resolveMedia(posterUrl) : undefined;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
@@ -41,28 +44,28 @@ export default function MediaPreviewModal({
         <div className="mt-4 flex flex-col items-center justify-center rounded-xl bg-black/40 p-4 min-h-[200px]">
           {mediaType === "VIDEO" ? (
             <video
-              src={mediaUrl}
-              poster={posterUrl || undefined}
+              src={src}
+              poster={poster}
               controls
               autoPlay
               className="w-full max-h-[340px] rounded-lg object-contain bg-black"
             />
           ) : (
             <div className="w-full text-center space-y-4">
-              {posterUrl && (
+              {poster && (
                 <img
-                  src={posterUrl}
+                  src={poster}
                   alt={title}
                   className="mx-auto h-32 w-32 rounded-xl object-cover shadow-lg border border-gold/30"
                 />
               )}
-              <audio src={mediaUrl} controls autoPlay className="w-full" />
+              <audio src={src} controls autoPlay className="w-full" />
             </div>
           )}
         </div>
 
         <div className="mt-4 flex justify-between items-center text-[11px] text-warm-white/60">
-          <span className="truncate">URL: {mediaUrl}</span>
+          <span className="truncate">URL: {src}</span>
           <button
             onClick={onClose}
             className="rounded-lg bg-gold/20 hover:bg-gold/30 text-gold-light px-3 py-1.5 font-bold transition cursor-pointer"
