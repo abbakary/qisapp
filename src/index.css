@@ -1,0 +1,134 @@
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --deep-green: #0f3d2e;
+  --teal: #15665c;
+  --gold: #c9a227;
+  --warm-white: #faf6ec;
+  --sand: #f1e8ce;
+  --ink: #1c1b14;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #FAF6EC;
+  color: #1C1B14;
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    height: 4px;
+  }
+  50% {
+    height: 11px;
+  }
+}
+
+@layer components {
+  /* App shell: full page width on PC/desktop, natural responsive container on phone */
+  .app-shell {
+    min-height: 100dvh;
+    width: 100%;
+    margin: 0;
+    background: #FAF6EC;
+    color: #1C1B14;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .khatam-star {
+    display: inline-block;
+    position: relative;
+    flex: none;
+  }
+  .khatam-star::before,
+  .khatam-star::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+    );
+  }
+  .khatam-star::after {
+    transform: rotate(22.5deg);
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .eq-bar {
+    width: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    animation: eq 0.9s ease-in-out infinite;
+  }
+
+  .btn-primary {
+    @apply w-full rounded-2xl bg-gold py-3.5 text-center text-sm font-extrabold text-deep-green transition active:scale-[0.98] disabled:opacity-60 cursor-pointer;
+  }
+  .btn-ghost {
+    @apply w-full rounded-2xl border border-line bg-white py-3.5 text-center text-sm font-bold text-deep-green transition active:scale-[0.98] cursor-pointer;
+  }
+  .field-label {
+    @apply text-[10.5px] font-bold uppercase tracking-[0.06em] text-deep-green;
+  }
+  .field-box {
+    @apply mt-1.5 w-full rounded-xl border-[1.4px] border-line bg-white px-3.5 py-3 text-[13px] text-ink outline-none focus:border-teal;
+  }
+  .card-shadow {
+    box-shadow: 0 3px 10px rgba(15, 61, 46, 0.08);
+  }
+
+  .screen-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hero slideshow — direction-aware slide transitions */
+  .slide-enter-right {
+    animation: slideFromRight 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+  .slide-enter-left {
+    animation: slideFromLeft 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  @keyframes slideFromRight {
+    from { opacity: 0; transform: translateX(48px) scale(0.97); }
+    to   { opacity: 1; transform: translateX(0)    scale(1);    }
+  }
+  @keyframes slideFromLeft {
+    from { opacity: 0; transform: translateX(-48px) scale(0.97); }
+    to   { opacity: 1; transform: translateX(0)     scale(1);    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Qisas al-Anbiyaa — Hadithi za Manabii",
+  "description": "Swahili-first Islamic stories: Prophets, Companions, Scholars, Seerah, Dua & Manners, Kids.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

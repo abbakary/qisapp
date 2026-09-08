@@ -1,0 +1,10 @@
+{
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://qisass-production.up.railway.app"
+    }
+  },
+  "rewrites": [
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}
